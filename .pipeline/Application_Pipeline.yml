@@ -6,7 +6,7 @@ steps:
   displayName: Install NodeJS 
   inputs:
     versionSource: 'spec'
-    versionSpec: '6.x'
+    versionSpec: 'v25.2.1'
     checkLatest: true
 - task: PowerShell@2
   displayName: Check Node Version
@@ -19,6 +19,16 @@ steps:
     targetType: 'inline'
     script: 'npm i'
 - task: PowerShell@2
+  displayName: Build React Project
   inputs:
     targetType: 'inline'
     script: 'npm run build'
+- task: ArchiveFiles@2
+  displayName: Create Zip File of Build Folder
+  inputs:
+    rootFolderOrFile: '$(System.DefaultWorkingDirectory)/build/'
+    includeRootFolder: true
+    archiveType: 'zip'
+    archiveFile: '$(System.DefaultWorkingDirectory)/build.zip'
+    replaceExistingArchive: true
+
