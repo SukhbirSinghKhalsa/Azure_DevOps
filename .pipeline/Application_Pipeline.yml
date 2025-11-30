@@ -1,0 +1,24 @@
+trigger: none 
+pool: self_hosted_pool
+
+steps: 
+- task: NodeTool@0
+  displayName: Install NodeJS 
+  inputs:
+    versionSource: 'spec'
+    versionSpec: '6.x'
+    checkLatest: true
+- task: PowerShell@2
+  displayName: Check Node Version
+  inputs:
+    targetType: 'inline'
+    script: 'node -v'
+- task: PowerShell@2
+  displayName: Install Node Dependencies
+  inputs:
+    targetType: 'inline'
+    script: 'npm i'
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: 'npm run build'
