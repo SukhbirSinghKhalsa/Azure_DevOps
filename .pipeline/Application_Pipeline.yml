@@ -23,12 +23,11 @@ steps:
   inputs:
     targetType: 'inline'
     script: 'npm run build'
-- task: ArchiveFiles@2
-  displayName: Create Zip File of Build Folder
+
+- task: PublishBuildArtifacts@1
+  displayName: Publish Build into Artifacts
   inputs:
-    rootFolderOrFile: '$(System.DefaultWorkingDirectory)/build/'
-    includeRootFolder: true
-    archiveType: 'zip'
-    archiveFile: '$(System.DefaultWorkingDirectory)/build.zip'
-    replaceExistingArchive: true
+    PathtoPublish: '$(System.DefaultWorkingDirectory)/build'
+    ArtifactName: 'todo-ui'
+    publishLocation: 'Container'
 
