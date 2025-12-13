@@ -1,6 +1,9 @@
 # Azure_DevOps
 Contains Different Yaml files used in Azure Devops, additionally having CI CD pipelines, Security checkup using tools like tflint, tfsec, checkov
 
+![Linting Diagram](https://github.com/SukhbirSinghKhalsa/Azure_DevOps/blob/main/linting.drawio.svg)
+
+
 ### File Structure
 ```bash
 root/
