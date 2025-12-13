@@ -1,0 +1,57 @@
+trigger: none
+pool: test
+
+steps:
+- task: NodeTool@0
+  displayName: Install NodeJS 
+  inputs:
+    versionSource: 'spec'
+    versionSpec: 'v25.2.1'
+    checkLatest: true
+
+- task: PowerShell@2
+  displayName: Check Node Version
+  inputs:
+    targetType: 'inline'
+    script: |
+      Write-Output "Node Version $(node -v)"
+      Write-Output "NPM Version $(npm -v)"
+
+- task: PowerShell@2
+  displayName: Lint JS using Biome JS 
+  continueOnError: true
+  inputs:
+    targetType: 'inline'
+    script: |
+      Invoke-WebRequest -Uri "https://github.com/biomejs/biome/releases/download/@biomejs/biome@2.3.8/biome-win32-x64.exe" -OutFile "$(Agent.ToolsDirectory)/biome.exe"
+      $(Agent.ToolsDirectory)/biome.exe lint $(System.DefaultWorkingDirectory)/src/
+
+- task: PowerShell@2
+  continueOnError: true
+  displayName: Lint CSS using Styelint
+  inputs:
+    targetType: 'inline'
+    script: |
+      npm install --save-dev stylelint stylelint-config-standard
+      Write-Output "Listing NPM Libraries Start:"
+      npm list
+      Write-Output "Listing NPM Libraries Ends here"
+      npx stylelint $(System.DefaultWorkingDirectory)/src --config stylelint.config.mjs
+
+- task: PowerShell@2
+  continueOnError: true
+  displayName: Lint YAML using yamllint
+  inputs:
+    targetType: 'inline'
+    script: |
+      pip install yamllint --target "$(Agent.ToolsDirectory)/yamllint"
+      $(Agent.ToolsDirectory)/yamllint/bin/yamllint $(System.DefaultWorkingDirectory)
+
+- task: PowerShell@2
+  continueOnError: true
+  displayName: Lint Markdown using markdownlint 
+  inputs:
+    targetType: 'inline'
+    script: |
+      npm install -g markdownlint-cli      
+      markdownlint $(System.DefaultWorkingDirectory)
