@@ -1,0 +1,134 @@
+trigger: none
+pool: test
+
+stages:
+ - stage:
+    displayName: Linting [Pre-Check]
+    jobs:
+      - job:
+        steps:
+          - task: NodeTool@0
+            displayName: Node Installer
+            inputs:
+              versionSource: "spec"
+              versionSpec: "16.x"
+         - task: PowerShell@2
+            displayName: Security Scanning with Retire JS
+            inputs:
+              targetType: "inline"
+              script: |
+                 npm install -g retire
+                 retire
+
+  - stage:
+    displayName: Linting [Pre-Check]
+    jobs:
+      - job:
+        steps:
+          - task: NodeTool@0
+            displayName: Node Installer
+            inputs:
+              versionSource: "spec"
+              versionSpec: "16.x"
+          - task: PowerShell@2
+            displayName: Check Linting for JS files
+            continueOnError: true
+            inputs:
+              targetType: "inline"
+              script: |
+                Invoke-WebRequest -Uri "https://github.com/biomejs/biome/releases/download/@biomejs/biome@2.3.10/biome-win32-x64.exe" -OutFile "$(Agent.ToolsDirectory)/biome.exe"
+                $(Agent.ToolsDirectory)/biome lint $(System.DefaultWorkingDirectory)/src
+          - task: PowerShell@2
+            continueOnError: true
+            inputs:
+              targetType: "inline"
+              script: |
+                pip install yamllint --target "$(Agent.ToolsDirectory)/yamllint"
+
+                $(Agent.ToolsDirectory)/yamllint/bin/yamllint $(System.DefaultWorkingDirectory)
+          - task: PowerShell@2
+            continueOnError: true
+            inputs:
+              targetType: "inline"
+              script: |
+                npm install -g markdownlint-cli      
+                markdownlint $(System.DefaultWorkingDirectory)
+  - stage:
+    displayName: Publish Build Artifacts
+    jobs:
+      - job:
+        steps:
+          - task: NodeTool@0
+            displayName: Node Installer
+            inputs:
+              versionSource: "spec"
+              versionSpec: "16.x"
+          - task: PowerShell@2
+            displayName: Node Dependencies Install
+            inputs:
+              targetType: "inline"
+              script: "npm install" #node_modules
+          - task: PowerShell@2
+            displayName: React Build Artifacts
+            inputs:
+              targetType: "inline"
+              script: "npm run build" #build - artifacts
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Artifacts to Pipeline
+            inputs:
+              targetPath: "$(System.DefaultWorkingDirectory)/build"
+              artifact: "React-Artifact"
+              publishLocation: "pipeline"
+# 1 Node installed --> npm - node package manager
+# 2 linting       --> code format, quality
+# 3 package.json --> dependencies --> npm install --> node_modules
+# 4 artifact creation --> npm run build --> build folder
+# 5 publish artifact on pipeline
+
+
+
+# -------------------
+# ReactJS - Repo 
+# NPM  - node package manager
+# Node -- install node -- auto installs npm 
+# npm --v
+
+# Dependencies files -- package.json -- npm install -- generate folder -- node_modules folder
+# to build --> npm run build -- generate build folder --> artifact
+
+# push the build to pipeline artifacts
+
+# Code --> install dependencies --> build --> artifacts --> server
+
+
+# linting -- code syntax, formatting check
+# biomejs -- javascript check
+# 1 npm
+# 2 direct download
+
+
+# yamllint -- yaml files
+# 1 pip -- python package manager
+
+# markdownlint -- .md files
+# npm 
+
+# stylelint -- css files
+# npm
+
+
+
+
+# 2 stages
+# stage - linting
+#   step1 - install node
+#   step2 - install biome and use it
+#   step3 - install markdownlint and use it
+#   step4 - install stylelint and use it
+#   step 4 - install yamllint and use it
+
+# stage - publish build artifacts
+#   step1 - install node
+#   step2 - dependencies install - npm install
+#   step3 - create artifact     - npm run build
+#   step4 - publish artifacts
