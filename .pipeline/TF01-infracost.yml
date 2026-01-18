@@ -1,0 +1,31 @@
+trigger: none
+pool: test
+
+stages:
+  - stage:
+    displayName: Linting [Pre-Check]
+    jobs:
+      - job:
+        steps:
+          - task: PowerShell@2
+      displayName: Install Infracost
+      inputs:
+        targetType: inline
+        script: |
+          $version = "0.10.43"
+          Write-Host "Downloading Infracost $version"
+            
+          Invoke-WebRequest `
+            -Uri "https://github.com/infracost/infracost/releases/download/$version/infracost-windows-amd64.tar.gz" `
+            -OutFile $(Agent.ToolDirectory)/infracost.tar.gz
+
+          tar -xzf $(Agent.ToolDirectory)/infracost.tar.gz
+
+  - task: PowerShell@2
+      displayName: Get Infra Breakdown
+      inputs:
+        targetType: inline
+        script: |
+         $(Agent.ToolDirectory)/infracost.exe --breakdown `
+         --path /sandbox`
+         --format json`
