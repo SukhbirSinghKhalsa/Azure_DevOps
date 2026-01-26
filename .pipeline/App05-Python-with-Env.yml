@@ -1,0 +1,76 @@
+trigger: none
+
+pool: test
+
+parameters:
+- name: install_python_dependencies
+  displayName: Install Python Dependencies
+  type: boolean
+  default: false
+
+jobs:
+  - job: publish
+    steps:
+    - task: PublishBuildArtifacts@1
+      displayName: Publish Build Artifacts into Pipeline
+      inputs:
+        PathtoPublish: '$(System.DefaultWorkingDirectory)'
+        ArtifactName: 'python-artifact'
+        publishLocation: 'Container'
+  
+
+  - deployment:
+    dependsOn: publish
+    environment:
+      name: Sandbox-Playground
+      resourceType: VirtualMachine
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadBuildArtifacts@1
+            displayName: Download Python Artifacts
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'python-artifact'
+              downloadPath: '/tmp/python'
+              cleanDestinationFolder: true
+      
+
+          - ${{ if eq(parameters.install_python_dependencies, true) }}:
+            - script: |
+                sudo apt-get update 
+                
+                sudo apt-get install -y curl gnupg2 unixodbc unixodbc-dev
+                
+                sudo mkdir -p /usr/share/keyrings
+                
+                curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
+                | gpg --dearmor \
+                | sudo tee /usr/share/keyrings/microsoft.gpg >/dev/null
+
+                echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/debian/12/prod bookworm main" \
+                | sudo tee /etc/apt/sources.list.d/mssql-release.list >/dev/null
+
+                sudo ACCEPT_EULA=Y apt install -y msodbcsql18
+
+                sudo apt-get install -y python3-pip
+                
+                sudo apt-get install -y python3-venv python3-pip
+                
+                sudo apt install uvicorn -y
+              displayName: Run Once Intially to Install Python Dependencies
+          
+          - script: |
+              python3 -m venv venv
+              ./venv/bin/python -m pip install --upgrade pip
+              ./venv/bin/python -m pip install -r requirements.txt
+            workingDirectory: '/tmp/python/python-artifact'
+            displayName: Install Dependencies for Python
+
+          - script: |
+              ./venv/bin/uvicorn app:app --host 0.0.0.0 --port 8000 &
+            workingDirectory: '/tmp/python/python-artifact'
+            displayName: Start Uvicorn Server for Python
+            
