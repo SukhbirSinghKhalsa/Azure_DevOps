@@ -1,0 +1,62 @@
+trigger: none
+pool: test
+
+stages:
+  - stage: continuos_integration
+    displayName: Continous Integration Stage
+    jobs:
+    - job: 
+      displayName: Continous Integration Job Steps
+      steps: 
+      - task: NodeTool@0
+        displayName: Install NodeJS 
+        inputs:
+          versionSource: 'spec'
+          versionSpec: 'v25.2.1'
+          checkLatest: true
+      - task: PowerShell@2
+        displayName: Check Node Version
+        inputs:
+          targetType: 'inline'
+          script: 'node -v'
+      - task: PowerShell@2
+        displayName: Install Node Dependencies
+        inputs:
+          targetType: 'inline'
+          script: 'npm i'
+      - task: PowerShell@2
+        displayName: Build React Project
+        inputs:
+          targetType: 'inline'
+          script: 'npm run build'
+      - task: PublishBuildArtifacts@1
+        displayName: Publish Build Artifacts into Pipeline
+        inputs:
+          PathtoPublish: '$(System.DefaultWorkingDirectory)/build'
+          ArtifactName: 'todo-ui'
+          publishLocation: 'Container'
+
+  - stage: continous_deployment_stage
+    dependsOn: continuos_integration
+    displayName: Continous Deployment Stage
+    jobs:
+      - deployment: Continous_Deployment
+        displayName: Push Code to Virtual Machine Steps
+        environment:
+          name: Sandbox-Playground
+          resourceType: VirtualMachine
+        strategy: 
+          runOnce:
+            deploy:          
+              steps:
+              - task: DownloadBuildArtifacts@1
+                displayName: Download Artifacts into Virtual Machine
+                inputs:
+                  buildType: 'current'
+                  downloadType: 'single'
+                  artifactName: 'todo-ui'
+                  downloadPath: '/tmp/test'
+
+              - script: |
+                  sudo mv /tmp/test/todo-ui/* /var/www/html
+                displayName: Move Build Artifacts to Nginx Default Directory
