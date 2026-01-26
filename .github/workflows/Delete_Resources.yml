@@ -12,12 +12,16 @@ on:
 # * * * * *
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   delete-resources:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout branch $GITHUB_REF_NAME
+    - name: Checkout branch ${{ github.ref_name }}
       uses: actions/checkout@v6.0.2
       
     - name: Azure Login
