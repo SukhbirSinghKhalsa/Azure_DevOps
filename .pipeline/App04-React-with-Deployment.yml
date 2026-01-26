@@ -60,3 +60,31 @@ stages:
               - script: |
                   sudo mv /tmp/test/todo-ui/* /var/www/html
                 displayName: Move Build Artifacts to Nginx Default Directory
+
+
+# Continuous Deployment
+
+# ============ Before with jobs
+# Step 1
+# Download ARTIFACT   --> local system
+
+# Dependency --> ssh - 22 port enabled, nsg -- 22 inbound port allow, public ip
+# step 2: Copy files over ssh --> local system to Vm push
+
+# step 3: VM command          --> copy files from /tmp/something to /var/www/html
+
+# ============After with deployments and environments
+# Step 0: make sure nginx is installed already
+
+# Step 1:
+# Environments -->
+# --> new Environments  --> enter name of env
+# --> resources type --> none | K8s | VM ✅
+# --> select VM
+#  --> OS --> select windows or linux ✅
+#  --> Execute code inside vm with  ---> ssh, bastion host, virtual machine -- custom data
+#  --> vm will display under resources in Environments
+
+# Step 2:  download ARTIFACT directly into virtual machines
+
+# Step 3:  Move/copy ARTIFACT from source directory to destination (/var/www/html)
