@@ -55,23 +55,23 @@ stages:
 
 
 # create a process files -- sudo nano /etc/systemd/system/uvicorn-app.service
-[Unit]
-Description=Uvicorn FastAPI App
-After=network.target
+# [Unit]
+# Description=Uvicorn FastAPI App
+# After=network.target
 
-[Service]
-User=azureuser
-Group=www-data
-WorkingDirectory=/tmp/python_artifact
-ExecStart=/usr/bin/uvicorn app:app --host 0.0.0.0 --port 8000
+# [Service]
+# User=azureuser
+# Group=www-data
+# WorkingDirectory=/tmp/python_artifact
+# ExecStart=/usr/bin/uvicorn app:app --host 0.0.0.0 --port 8000
 
-Restart=always
-RestartSec=3
+# Restart=always
+# RestartSec=3
 
-#Environment="PATH=/path/to/venv/bin"
+# #Environment="PATH=/path/to/venv/bin"
 
-[Install]
-WantedBy=multi-user.targetazureuser
+# [Install]
+# WantedBy=multi-user.targetazureuser
 
 
 # restart daemon
