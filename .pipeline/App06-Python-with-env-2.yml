@@ -1,0 +1,78 @@
+trigger: none
+
+pool: test
+
+stages:
+- stage:
+  jobs:
+  - job: ci_job
+    displayName: Continous Integration
+    steps:
+    - task: PublishBuildArtifacts@1
+      displayName: Python Artifact Publish 
+      inputs:
+        PathtoPublish: '$(System.DefaultWorkingDirectory)'
+        ArtifactName: 'python_artifact'
+        publishLocation: 'Container'
+    
+  - deployment: 
+    dependsOn: ci_job
+    displayName: Continous Deployment
+    environment:
+      name: Sandbox-Playground
+      resourceType: virtualMachine
+    strategy:
+     runOnce:
+       deploy:
+         steps:
+         - task: DownloadBuildArtifacts@1
+           displayName: Python Artifact Download 
+
+           inputs:
+             buildType: 'current'
+             downloadType: 'single'
+             artifactName: 'python_artifact'
+             downloadPath: '/tmp/'
+         - script: |
+              sudo pip install -r requirements.txt -y
+              sudo systemctl restart uvicorn-app
+
+
+
+#Installation
+# sudo su
+# apt-get update && apt-get install -y curl gnupg2 unixodbc unixodbc-dev
+# curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft.gpg && \
+#     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/debian/12/prod bookworm main" \
+#     > /etc/apt/sources.list.d/mssql-release.list
+
+# apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql18
+
+
+# which uvicorn
+# sudo apt install uvicorn
+# sudo apt install python3-pip
+
+
+# create a process files -- sudo nano /etc/systemd/system/uvicorn-app.service
+[Unit]
+Description=Uvicorn FastAPI App
+After=network.target
+
+[Service]
+User=azureuser
+Group=www-data
+WorkingDirectory=/tmp/python_artifact
+ExecStart=/usr/bin/uvicorn app:app --host 0.0.0.0 --port 8000
+
+Restart=always
+RestartSec=3
+
+#Environment="PATH=/path/to/venv/bin"
+
+[Install]
+WantedBy=multi-user.targetazureuser
+
+
+# restart daemon
+# sudo systemctl start uvicorn-app
