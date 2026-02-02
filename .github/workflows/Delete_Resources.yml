@@ -56,7 +56,7 @@ jobs:
           #     echo "Deleting lock: $LOCK_ID"
           #     az lock delete --ids "$LOCK_ID"
           #   done <<< "$LOCK_IDS"
-          fi
+          # fi
           
           for rg in $(az group list --query "[].name" -o tsv); do
             echo "Deleting resource group: $rg"
