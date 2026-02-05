@@ -1,0 +1,29 @@
+name: Terraform Plan part 2
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/create-workflow
+
+jobs: 
+  terraform-plan:
+    runs-on: self-hosted
+    steps:
+          - name: Checkout
+            uses: actions/checkout@v6.0.2
+          
+          - name: Azure Login
+            uses: Azure/login@v2.3.0
+            with:
+              client-id: 7508b7d7-5c04-4257-8901-feb7e72c00a7
+              tenant-id: 45498cdf-914d-4435-8790-31bcb1d6af30
+              subscription-id: 331a949f-b38b-4711-a7fb-64ce9e156260
+      
+          - run: terraform init
+            name: Initialize Terraform Providers, Backend, Modules
+      
+          - run: terraform validate
+            name: Check Terraform Syntax 
+      
+          - run: terraform plan
+            name: Get Infra Resources Output
