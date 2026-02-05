@@ -8,10 +8,13 @@ on:
 jobs: 
   terraform-plan:
     runs-on: self-hosted
+    permissions:
+      id-token: write   # REQUIRED for OIDC
+      contents: read
     steps:
           - name: Checkout
             uses: actions/checkout@v6.0.2
-          
+            
           - name: Azure Login
             uses: Azure/login@v2.3.0
             with:
