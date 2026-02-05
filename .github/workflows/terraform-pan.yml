@@ -11,7 +11,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6.0.2
       - name: login to azure
-        run: az login --service-principal --username b86aa10f-3d91-432d-b976-e3a50d2ab3a2 --password 1xD8Q~O0k8jvY4dOLZs4KTE8S3CjYY8e47HrucRL --tenant 45498cdf-914d-4435-8790-31bcb1d6af30
+        run: az login --service-principal --username ${{ secrets.CLIENT_ID }} --password ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
       - name: terraform init
         run: terraform init
       - name: terraform validate
