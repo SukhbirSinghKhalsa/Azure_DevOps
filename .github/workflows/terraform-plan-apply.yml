@@ -1,0 +1,36 @@
+name: Terraform Plan Apply
+
+on:
+  workflow_dispatch:
+
+jobs:
+  terraform-plan:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+      - name: login to azure
+        run: az login --service-principal --username ${{ secrets.CLIENT_ID }} --password ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
+      - name: terraform init
+        run: terraform init
+      - name: terraform validate
+        run: terraform validate
+      - name: terraform plan
+        run: terraform plan
+  terraform-apply:
+    needs: terraform-plan
+    environment:
+      name: playground
+    runs-on: self-hosted
+    steps:
+      - name: Checkout to {{}}
+        uses: actions/checkout@v6.0.2
+      - name: Login to Azure with Service Princioal
+        run: az login --service-principal --username ${{ secrets.CLIENT_ID }} --password ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
+      - name: Intialize the Providers, Modules, Backend
+        run: terraform init
+      - name: Add Resources to the Cloud
+        run: terraform apply -auto-approve
+
+      
+  
