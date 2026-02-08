@@ -1,0 +1,4 @@
+# this select agent name 'ssk-agent' from 'agent-pool-self-hosted' Agent Pool
+pool:
+  name: agent-pool-self-hosted
+  demands: Agent.Name -equals ssk-agent
