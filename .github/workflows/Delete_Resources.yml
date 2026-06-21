@@ -27,9 +27,9 @@ jobs:
     - name: Azure Login
       uses: Azure/login@v2.3.0
       with:
-        client-id: 2f5a7df0-f5c2-4364-950d-474d6602daab
-        tenant-id: 0ea3b997-cc5d-4c90-a4a4-5c41a2364f32
-        subscription-id: f3dd8656-66bf-4af3-bce9-c04adf655c30
+        client-id: ${{ secrets.CLIENT_ID }}
+        tenant-id: ${{ secrets.TENANT_ID }}
+        subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
 
     - name: Check Current Azure Account
       uses: Azure/cli@v2.2.0
