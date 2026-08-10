@@ -1,8 +1,9 @@
 name: Delete Azure Resources to Reduce Billing in Trial Account
 
 on:
-  schedule:
-    - cron: 0 19 * * *
+  workflow_dispatch:
+  # schedule:
+  #   - cron: 0 19 * * *
 # ┌───────────── minute (0 - 59)
 # │ ┌───────────── hour (0 - 23)
 # │ │ ┌───────────── day of the month (1 - 31)
@@ -10,7 +11,6 @@ on:
 # │ │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
 # │ │ │ │ │
 # * * * * *
-  workflow_dispatch:
 
 permissions:
   id-token: write
