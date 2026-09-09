@@ -1,0 +1,30 @@
+name: Azure Login
+
+on:
+  workflow_dispatch:
+
+jobs:
+  azure-login:
+    runs-on: ubuntu-latest
+
+    env:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID_SB }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET_SB }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID_SB }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID_SB }}
+
+    steps:
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: |
+            {
+              "clientId": "${{ env.ARM_CLIENT_ID }}",
+              "clientSecret": "${{ env.ARM_CLIENT_SECRET }}",
+              "subscriptionId": "${{ env.ARM_SUBSCRIPTION_ID }}",
+              "tenantId": "${{ env.ARM_TENANT_ID }}"
+            }
+
+      - name: Verify Azure Login
+        run: |
+          az account show
