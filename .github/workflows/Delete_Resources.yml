@@ -25,7 +25,7 @@ jobs:
       uses: actions/checkout@v6.0.2
       
     - name: Azure Login
-      uses: Azure/login@v2.3.0
+      uses: Azure/login@v3.0.2
       with:
         client-id: ${{ secrets.CLIENT_ID }}
         tenant-id: ${{ secrets.TENANT_ID }}
